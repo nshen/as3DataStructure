@@ -1,7 +1,9 @@
 package ds
 {
+	import ds.iterators.DListIterator;
+	import ds.nodes.DListNode;
 	/**
-	 *  这是一个双向链表
+	 *  双向链表
 	 */
 	public class DLinkedList
 	{
@@ -11,214 +13,236 @@ package ds
 		
 		
 		public function DLinkedList(...args):void
-		{
+		{ 
 		   var l:uint = args.length;
 		   if(l>0)
 		   {
-			   head = tail = new DListNode(args[0])
+			   head = tail = new DListNode(args[0]);
+			   _length++ ;
 			   if(l>1)
 			   {
-				 for(var i:uint = 1 ; i<l;i++)
-				 {
-					 tail.next = new DListNode(args[i])
-					 tail.next.prev =tail
-					 tail = tail.next
-				 }
+				 for(var i:uint = 1 ; i < l; i++)
+					 push(args[i]);
 			   }
-			   this._length++ ;
 		   }
 		 }
 				
 		/**
 		 *  根据索引取元素，由于需要遍历所以比数组慢很多
 		 */
-		public function get(Index:uint):*
+		public function getData(p_index:uint):*
 		{
-			if(this._length <=0 || Index<0 || Index>this._length-1)return null;
-			var n:DListNode = this.head
-			var i:uint = 0
-			while(i<Index)
-			{
-				i++
-				n=n.next
-			}
-			return n.data			
+			var n:DListNode = getListNode(p_index);
+			return n == null ? null : n.data;
+		}
+		/**
+		 *  根据索赋值元素，由于需要遍历所以比数组慢很多
+		 */
+		public function setData(p_index:uint , obj:*):*
+		{
+			var n:DListNode = getListNode(p_index);
+			if (n)
+			  n.data = obj;
 		}
 		
-		 
+
 		/**
-		 *  添加一个元素到队尾
+		 * 添加一个元素到队尾
+		 * @param	obj
+		 * @return
 		 */
-		public function push(obj:*):*
+		public function push(obj:*):DListNode
 		{
-			if(this._length>0)
+			if (obj == null)
+				return null;
+			if (_length > 0)
 			{
-				tail.next =  new DListNode(obj)
-				tail.next.prev = tail
-				tail = tail.next				
+				tail.insertAfter(obj);
+				tail = tail.next;
 			}else
 			{
-				head = tail = new DListNode(obj)
+				head = tail = new DListNode(obj);
 			}
-			this._length++
-			return tail.data
+			_length++;
+			return tail;
 		}
 		
 		/**
 		 *  删除队尾元素
 		 */
-		public function pop():*
+		public function pop():DListNode
 		{
-			if(this._length>0)
-			{  
-				var d:* = tail.data
-				if(this._length==1)
-				{
-					head = tail =null
-				}else
-				{				 
-					tail = tail.prev
-					tail.next = null
-				}
-				this._length--
-				return d;
+			if (_length <= 0) 
+			   return null;
+			   
+			var d:DListNode = tail;
+			if(this._length == 1)
+				head = tail = null;
+			else
+			{
+				tail = tail.prev;
+				tail.next = null;
 			}
+			_length--;
+			return d;
 		}
 		
 		/** 
 		 * 删除第一个元素
 		 */
-		public function shift():*
+		public function shift():DListNode
 		{
-			if(this._length>0)
+			if (_length <= 0)
+			   return null;
+			   
+			var d:DListNode = head;
+			if (_length == 1)
 			{
-				var d:* = this.head.data
-				if(this._length==1)
-				{
-					head = tail = null
-				}else
-				{
-					head = head.next
-					head.prev = null
-				}
-				this._length--
-				return d;
+				head = tail = null;
+			}else
+			{
+				head = head.next;
+				head.prev = null;
 			}
+			_length--;
+			return d;
 			
 		}
 		
 		/**
-		 *  在对头添加一个元素
+		 *  在队头添加一个元素
 		 */
-		public function unshift(obj:*):*
+		public function unshift(obj:*):DListNode
 		{
-			if(this._length>0)
+			if (obj == null)
+				return null;
+			if (_length > 0)
 			{
-				head.prev =new DListNode(obj)
-				head.prev.next =head
+				head.insertBefore(obj);
 				head = head.prev;
 			}else
 			{
-				head = tail = new DListNode(obj)
+				head = tail = new DListNode(obj);
 			}
-			this._length++
-			return head.data
+			_length++;
+			return head;
+		}
+		
+		/**
+		 * 在iterator后插入数据，如果iterator是invalid的则push到对尾
+		 * @param	iterator
+		 * @param	obj
+		 */
+		public function insertAfter( iterator:DListIterator , obj:*):void
+		{
+			if (iterator && iterator.node != null)
+			{
+				iterator.node.insertAfter(obj);
+				if (iterator.node == tail)
+				  tail = tail.next;
+				  
+				_length ++ ;
+			}else
+			{
+				push(obj);
+			}
+		}
+		
+		/**
+		 * 在iterator前插入数据，如果iterator是invalid的则unshift到队首
+		 * @param	iterator
+		 * @param	obj
+		 */
+		public function insertBefore( iterator:DListIterator , obj:*):void
+		{
+			if (iterator && iterator.node != null)
+			{
+				iterator.node.insertBefore(obj);
+				if (iterator.node == head)
+				  head = head.prev;
+				  
+				_length ++;
+			}else {
+				unshift(obj);
+			}
 		}
 			 
+		/**
+		 * 删除iterator指定节点，并把iterator向后移一位。
+		 * @param	iterator
+		 */
+		public function remove( iterator:DListIterator ):void
+		{
+			if (!iterator || !iterator.node)
+				return;
+				
+			var node:DListNode = iterator.node;
+			if (node == head)
+				head = head.next;
+			else if (node == tail)
+				tail = tail.prev;
+			iterator.next();
+			node.delink();
+			
+			if (head == null)
+			  tail = null;
+			
+			_length --;
+		}
+
+		
 		/**
 		 *  取得元素个数
 		 */
 		public function get length():uint
 		{
-			return this._length
-		}
-		
-		
-		
-		
-		/**
-		 *  Get iterator
-		 */
-		public function getIterator():DListIterator 
-		{
-			return new DListIterator(this, head);
-		}
-		
-		
-		public function insert(Iterator:DListIterator,obj:*):void
-		{
-			if(Iterator.list!=this)return
-			if(Iterator.node)
-			{				
-				var n:DListNode =  new DListNode(obj)
-					n.prev = Iterator.node
-					n.next = Iterator.node.next					
-				    if(Iterator.node.next)
-					{
-						Iterator.node.next.prev = n
-					}else
-					{
-						tail = n
-					}
-					Iterator.node.next = n
-					this._length++
-			}else
-			{
-				this.push(obj);
-			}
+			return _length;
 		}
 		
 		/**
-		 * 删除Iterator.node，如果删除成功则Iterator向后移一位，如果已经到了结尾则Iterator指向head
+		 * 取iterator，默认指向head
+		 * @param	node
+		 * @return
 		 */
-		public function remove(Iterator:DListIterator):*
+		public function getIterator(node:DListNode = null ):DListIterator
 		{
-			if(Iterator.list!=this)return
-			var n:DListNode = Iterator.node
-			if(n)
-			{
-				if(n==head)
-				{
-					head = n.next
-				}else if(n==tail)
-				{
-					tail = tail.prev
-				}
-				if(n.prev)n.prev.next = n.next
-				if(n.next)
-				{
-					n.next.prev = n.prev
-					Iterator.node= n.next
-				}else
-				{
-					Iterator.node= head
-				}
-				 
-				n.prev = n.next = null
-				this._length--
-			}
-			
+			return new DListIterator(this, node == null? head : node);
 		}
-		
-		public function toString():String
-		{
-			var str:String = "["
-			var n:DListNode = this.head
+
+	   /**
+		* @param	p_index
+		* @return  DListNode
+		*/
+	   public function getListNode(p_index:uint):DListNode
+	   {
+		   if (_length <= 0 || p_index < 0 || p_index > _length-1)return null;
+		   var n:DListNode = head;
+		   var i:uint = 0;
+		   while (i < p_index)
+		   {
+			   i++;
+			   n = n.next;
+		   }
+		   return n;	
+	   }
+	   
+	   public function toString():String
+	   {
+			var str:String = "[";
+			var n:DListNode = this.head;
 			while(n)
 			{
-				str+= n.toString()
-				if(n!=this.tail)
-				{
+				str += n.toString();
+				if(n!= this.tail)
 					str+=",";
-				}
 				
-				n=n.next
-					
+				n = n.next;
 			}
-			str+="]"
+			str += "]";
 			return str;
 		}
 	}
 
 }
+
 

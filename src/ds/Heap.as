@@ -13,8 +13,8 @@ package ds
 	 */
 	public class Heap
 	{
-		private var _heap:Array 
-		private var _compare:Function
+		private var _heap:Array;
+		private var _compare:Function;
 		
 		/**
 		 * @param compare  返回正数，则a排在b前边,如果不指定，默认为 function (a:int,b:int):int{return a-b};
@@ -61,7 +61,8 @@ package ds
 		public function enqueue(obj:*):void
 		{
 			this._heap.push(obj)
-				
+			//插入到树底部，并开始上浮
+			
 			var parentIndex:int = (this._heap.length-2)>> 1
 			var objIndex:int = this._heap.length -1
 			var temp:* = this._heap[objIndex]

@@ -2,25 +2,25 @@ package ds
 {
 	public class GraphNode
 	{
-		public var data:*
-		public var arcs:Array
-		public var marked:Boolean  
+		public var data:*;
+		public var arcs:Array;
+		public var marked:Boolean;  //遍历时标记用
 			
 		public function GraphNode(obj:*):void
 		{
-			this.data = obj
-		    this.arcs = []
-			this.marked = false
+			this.data = obj;
+		    this.arcs = [];
+			this.marked = false;
 		}
 		
 		/**
 		 * 添加一个从当前GraphNode到目标GraphNode的Arc
 		 * @param p_node 目标GraphNode
-		 * @param p_weight 该Arc的重量(weight)
+		 * @param p_weight 该Arc的权重(weight)
 		 */
-		public function addArc(p_node:GraphNode , p_weight:Number):void
+		public function addArc(p_node:GraphNode , p_weight:*):void
 		{
-			this.arcs.push(new GraphArc(p_node,p_weight));
+			arcs.push(new GraphArc(p_node,p_weight));
 		}
 		
 		/**
@@ -29,13 +29,13 @@ package ds
 		 */
 		public function removeArc(p_targetNode:GraphNode):Boolean
 		{
-			var l:int = this.arcs.length
+			var l:int = this.arcs.length;
 			for(var i:int = 0 ; i< l; i++)
 			{
-				if(arcs[i]==p_targetNode)
+				if (arcs[i] == p_targetNode)
 				{
-					arcs.splice(i,1)
-					return true
+					arcs.splice(i, 1);
+					return true;
 				}
 			}
 			return false;
@@ -48,15 +48,12 @@ package ds
 		 */
 		public function getArc(p_targetNode:GraphNode):GraphArc
 		{
-			var l:int = this.arcs.length
-			for each (var arc:GraphArc in this.arcs)
+			for each (var arc:GraphArc in arcs)
 			{
 				if(arc.targetNode == p_targetNode)
-				{
-					return arc
-				}
+					return arc;
 			}
-			return null
+			return null;
 		}
 		
 	}

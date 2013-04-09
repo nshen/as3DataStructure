@@ -2,11 +2,12 @@ package ds
 {
 	public class Graph
 	{
-		public var nodes:Array
-		public var count:int
+		public var nodes:Array;
+		public var count:int;
+		
 		public function Graph()
 		{
-			this.nodes = []
+			this.nodes = [];
 			count = 0;
 		}
 		
@@ -14,10 +15,11 @@ package ds
 		 * 向图中添加一个GraphNode
 		 * @return 成功true否则false
 		 */
-		public function addNode(node:GraphNode,index:int):Boolean
+		public function addNode(data:*,index:int):Boolean
 		{
-			if(this.nodes[index])return false
-			nodes[index] = node
+			if (this.nodes[index]) return false;
+			nodes[index] = new GraphNode(data);
+			count ++ ;
 			return true;
 		}
 		
@@ -27,9 +29,9 @@ package ds
 		 */
 		public function removeNode(index:int):Boolean
 		{
-			var node:GraphNode = this.nodes[index]
+			var node:GraphNode = this.nodes[index];
 			if(!node)return false;
-			var l:int = this.nodes.length
+			var l:int = this.nodes.length;
 			for(var i:int = 0 ; i< l ; i++)
 			{
 				if(this.nodes[i].getArc(node))
@@ -37,7 +39,8 @@ package ds
 					this.removeArc(i,index);
 				}
 			}
-			this.nodes.splice(index,1)
+			this.nodes.splice(index, 1);
+			count --;
             return true
 		};
 		
@@ -52,20 +55,20 @@ package ds
 		 * 添加一个从p_fromIndex到p_toIndex的arc
 		 * @param p_fromIndex 原node索引
 		 * @param p_toIndex   指向的node索引
-		 * @param p_weight    arc的重量(weight)
+		 * @param p_weight    arc的权重(weight)
 		 * @return 成功true，否则false
 		 */
-		public function addArc(p_fromIndex:int , p_toIndex:int,p_weight:int=1):Boolean
+		public function addArc(p_fromIndex:int , p_toIndex:int, p_weight:* = 1):Boolean
 		{
 			var from:GraphNode = this.nodes[p_fromIndex];
 			var to:GraphNode = this.nodes[p_toIndex];
 			if(from && to)
 			{
-				if(from.getArc(to))return false
+				if (from.getArc(to)) return false; //已经有了
 				from.addArc(to,p_weight);
-				return true
+				return true;
 			}
-			return false
+			return false;
 		}
 		
 		/**
@@ -78,10 +81,10 @@ package ds
 			var to:GraphNode = this.nodes[p_toIndex];
 			if(from && to)
 			{
-				from.removeArc(to)
-				return true
+				from.removeArc(to);
+				return true;
 			}
-			return false
+			return false;
 		}
 		
 		/**
@@ -103,7 +106,7 @@ package ds
 		{
 		    for each (var n:GraphNode in  this.nodes)
 			{
-				if(n)n.marked = false
+				if (n) n.marked = false;
 			}
 		}
 		
@@ -112,17 +115,15 @@ package ds
 		 */
 		public function depthFirst(p_node:GraphNode , p_process:Function):void
 		{
-			if(!p_node)return;
+			if (!p_node) return;
 			p_process(p_node);
 			p_node.marked = true;
-			var arcs:Array = p_node.arcs
-			var l:int = arcs.length	
+			var arcs:Array = p_node.arcs;
+			var l:int = arcs.length;
 			for(var i:int = 0 ; i<l; i++)
 			{
-				if(  !GraphArc(arcs[i]).targetNode.marked)
-				{
-				     depthFirst(GraphArc(arcs[i]).targetNode,p_process)
-				}
+				if ( !GraphArc(arcs[i]).targetNode.marked)
+				     depthFirst(GraphArc(arcs[i]).targetNode, p_process);
 			}
 		}
 		/**
@@ -130,24 +131,25 @@ package ds
 		 */
 		public function breadFirst(p_node:GraphNode,  p_process:Function):void
 		{
-			if(!p_node)return
-			var queue:DLinkedList = new DLinkedList()
-			var itr:DListIterator =  queue.getIterator()
-			queue.push(p_node)
-			p_node.marked = true
-			while(queue.length>0)
+			if (!p_node) return;
+			var queue:DLinkedList = new DLinkedList();
+			var itr:DListIterator =  queue.getIterator();
+			queue.push(p_node);
+			p_node.marked = true;
+			
+			while (queue.length > 0)
 			{
-				p_process(queue.head)
-				var arcs:Array = GraphNode(queue.head.data).arcs
+				p_process(queue.head);
+				var arcs:Array = GraphNode(queue.head.data).arcs;
 				for(var i:int= 0 ; i< arcs.length;i++)
 				{
 					if(!GraphArc(arcs[i]).targetNode.marked)
 					{
-						GraphArc(arcs[i]).targetNode.marked = true
-						queue.push(GraphArc(arcs[i]).targetNode)
+						GraphArc(arcs[i]).targetNode.marked = true;
+						queue.push(GraphArc(arcs[i]).targetNode);
 					}
 				}
-				queue.shift()
+				queue.shift();
 			}
 				
 				

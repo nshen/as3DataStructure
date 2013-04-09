@@ -19,7 +19,7 @@ package ds
 		public var _midY:int;
 	 
 		
-		public var _children:Array = []
+		public var _children:Array = [];
 			
 		public function QuadTree(p_rect:Rectangle,p_maxDepth:int = 3,currentDepth:int = 0):void
 		{
